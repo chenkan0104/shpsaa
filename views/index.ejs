@@ -39,12 +39,14 @@
               </tr>
             </thead>
             <tbody>
+            <% for (var i=0; i<members.length; i++) { %>
               <tr>
                 <th><input type="checkbox"></th>
-                <td><a href="">chenkan</a></td>
-                <td>$0</td>
-                <td><a href=""><i class="glyphicon glyphicon-pencil"></i></a></td>
+                <td><a href=""><%=members[i].name%></a></td>
+                <td>&yen;<%=members[i].balance%></td>
+                <td><a href="/detail/<%=members[i].email%>"><i class="glyphicon glyphicon-pencil"></i></a></td>
               </tr>
+            <% } %>
             </tbody>
           </table>
         </div>

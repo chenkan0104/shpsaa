@@ -1,5 +1,7 @@
 module.exports = {
 	cookieParser: "shpsaa",
 	db: "shpsaa",
-	host: "localhost"
+	port: "27017",
+	host: "localhost",
+	member_collection: "member"
 }

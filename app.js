@@ -31,11 +31,12 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/login', routes.index);
-app.post('/login', routes.index);
-app.get('/reg', routes.index);
-app.post('/reg', routes.index);
-app.post('/charge', user.list);
+app.post('/charge', routes.charge);
+app.get('/detail/:email', routes.detail);
+app.post('/detail/:email', routes.update);
+app.get('/delete/:email', routes.delete);
+app.get('/add', routes.add);
+app.post('/add', routes.doAdd);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
