@@ -31,8 +31,10 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.post('/add', user.list);
-app.get('/delete', user.list);
+app.get('/login', routes.index);
+app.post('/login', routes.index);
+app.get('/reg', routes.index);
+app.post('/reg', routes.index);
 app.post('/charge', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
