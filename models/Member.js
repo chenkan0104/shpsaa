@@ -4,18 +4,13 @@ var mongod_path = 'mongodb://'+settings.host+':'+settings.port+'/'+settings.db;
 var member_collection = settings.member_collection;
 
 function Member (member) {
-  this.email = member.email || "";//without @baidu.com
-  this.name = member.name || "";
-  this.balance = member.balance || 0;
+  this.email = member.email;//without @baidu.com
+  this.name = member.name;
+  this.balance = member.balance;
 };
-module.exports = Member;
+exports.Member = Member;
 
-Member.prototype.insert = function(callback) {
-  var member = {
-    email: this.email,
-    name: this.name,
-    balance: this.balance
-  };
+exports.insert = function(member, callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
 
@@ -34,12 +29,7 @@ Member.prototype.insert = function(callback) {
   });
 };
 
-Member.prototype.update = function(callback) {
-  var member = {
-    email: this.email,
-    name: this.name,
-    balance: this.balance
-  };
+exports.update = function(member, callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
 
@@ -55,7 +45,7 @@ Member.prototype.update = function(callback) {
   });
 };
 
-Member.prototype.delete = function(callback) {
+exports.deleteByEmail = function(email, callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
 
@@ -63,7 +53,7 @@ Member.prototype.delete = function(callback) {
     if(err) throw err;
 
     var collection = db.collection(member_collection);
-    collection.remove({email: this.email}, function(err, count) {
+    collection.remove({email: email}, function(err, count) {
       db.close();
       if (count = 1) {
         callback(err, true);
@@ -74,7 +64,7 @@ Member.prototype.delete = function(callback) {
   });
 };
 
-Member.prototype.findAll = function(callback) {
+exports.findAll = function(callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
 
@@ -93,7 +83,7 @@ Member.prototype.findAll = function(callback) {
   });
 };
 
-Member.prototype.findOneByEmail = function(callback) {
+exports.findOneByEmail = function(email, callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
 
@@ -101,7 +91,7 @@ Member.prototype.findOneByEmail = function(callback) {
     if(err) throw err;
 
     var collection = db.collection(member_collection);
-    collection.findOne({email: this.email}, function(err, docs) {
+    collection.findOne({"email": email}, function(err, docs) {
       db.close();
       if (docs) {
         callback(err, docs);

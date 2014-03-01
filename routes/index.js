@@ -1,8 +1,7 @@
 var Member = require('../models/Member.js');
 
 exports.index = function(req, res){
-	var member = new Member({});
-	member.findAll(function (err, docs) {
+	Member.findAll(function (err, docs) {
 		if (err) {
 			req.session.error = "something wrong!";
 			res.redirect('/');
@@ -16,9 +15,7 @@ exports.index = function(req, res){
 };
 
 exports.detail = function(req, res){
-	var member = new Member({});
-	member.email = req.params.email;
-	member.findOneByEmail(function (err, docs) {
+	Member.findOneByEmail(req.params.email, function (err, docs) {
 		if (err) {
 			req.session.error = "something wrong!";
 			res.redirect('/');
@@ -29,7 +26,7 @@ exports.detail = function(req, res){
 			} else {
 				res.render('detail', {
 					title: "Detail",
-					member: member
+					member: docs
 				});
 			}
 		}
@@ -37,24 +34,23 @@ exports.detail = function(req, res){
 };
 
 exports.update = function(req, res){
-	var member = new Member({});
-	member.email = req.params.email;
-	member.name = req.body.name;
-	member.update(function (err) {
+	var member = {
+		email: req.params.email,
+		name: req.body.name
+	}
+	Member.update(member, function (err) {
 		if (err) {
 			req.session.error = "update filed!";
 			res.redirect('/');
 		} else {
 			req.session.success = "update succeed!";
-			res.redirect('/detail/'+member.email);
+			res.redirect('/');
 		}
 	});
 };
 
 exports.delete = function(req, res){
-	var member = new Member({});
-	member.email = req.params.email;
-	member.delete(function (err, count) {
+	Member.deleteByEmail(req.params.email, function (err, count) {
 		if (err) {
 			req.session.error = "delete failed!";
 			res.redirect('/');
@@ -75,17 +71,18 @@ exports.add = function(req, res){
 
 exports.doAdd = function(req, res){
 	var email = req.body.email.match("[a-z0-9]+");
-	var member = new Member({});
-	member.email = email;
-	member.name = req.body.name;
-	member.balance = parseInt(req.body.initial);
-	member.findOneByEmail(function (err, docs) {
-		console.log(docs);
+	var member = {
+		email: email,
+		name: req.body.name,
+		balance: parseInt(req.body.initial)
+	};
+
+	Member.findOneByEmail(email, function (err, docs) {
 		if (docs) {
 			req.session.error = "this email has already been added!";
 			res.redirect('/');
 		} else {
-			member.insert(function (err, docs) {
+			Member.insert(member, function (err, docs) {
 				if (err) {
 					req.session.error = "add failed";
 					res.redirect('/');
