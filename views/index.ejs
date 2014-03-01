@@ -3,7 +3,7 @@
   <head>
     <title><%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel='stylesheet' href='/css/style.css' />
 
     <!--[if lt IE 9]>
@@ -13,9 +13,26 @@
   </head>
   <body>
   	<div class="container">
-	    <h1>Hello, world!</h1>
+      <input type="text" placeholder="Search">
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>top</th>
+            <th>balance</th>
+            <th><a href="/add"><i class="icon-plus-sign"></i></a></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="">chenkan</a></td>
+            <td>$0</td>
+            <td>
+              <a href=""><i class="icon-pencil"></i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
   	</div>
-
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
   </body>
