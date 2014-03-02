@@ -4,8 +4,7 @@ exports.index = function(req, res){
 	Member.findAll(function (err, docs) {
 		if (err) {
 			req.session.error = "something wrong!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		} else {
 			if (typeof(req.session.success) != 'undefined') {
 				var success = req.session.success;
@@ -19,8 +18,6 @@ exports.index = function(req, res){
 			} else {
 				var error = null;
 			}
-			console.log("success:"+success);
-			console.log("error:"+error);
 			res.render('index', {
 				title: 'AA',
 				members: docs,
@@ -35,13 +32,11 @@ exports.detail = function(req, res){
 	Member.findOneByEmail(req.params.email, function (err, docs) {
 		if (err) {
 			req.session.error = "something wrong!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		} else {
 			if (!docs) {
 				req.session.error = "no such member!";
-				res.redirect('/');
-				return ;
+				return res.redirect('/');
 			} else {
 				if (typeof(req.session.success) != 'undefined') {
 					var success = req.session.success;
@@ -69,8 +64,7 @@ exports.detail = function(req, res){
 exports.update = function(req, res){
 	if (req.body.name == "") {
 		req.session.error = "name must be filled!";
-		res.redirect("/");
-		return ;
+		return res.redirect("/");
 	}
 	var member = {
 		email: req.params.email,
@@ -79,12 +73,10 @@ exports.update = function(req, res){
 	Member.update(member, function (err) {
 		if (err) {
 			req.session.error = "update filed!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		} else {
 			req.session.success = "update succeed!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		}
 	});
 };
@@ -93,12 +85,10 @@ exports.delete = function(req, res){
 	Member.deleteByEmail(req.params.email, function (err, count) {
 		if (err) {
 			req.session.error = "delete failed!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		} else {
 			req.session.succeed = "already deleted!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		}
 	})
 };
@@ -106,18 +96,15 @@ exports.delete = function(req, res){
 exports.charge = function(req, res){
 	if (req.body.members.length == 0) {
 		req.session.error = "no members?";
-		res.send({error: "no members"});
-		return ;
+		return res.send({error: "no members"});
 	}
 	if (req.body.payer == "") {
 		req.session.error = "no one paid the money?";
-		res.send({error: "no one paid the money"});
-		return ;
+		return res.send({error: "no one paid the money"});
 	}
 	if (req.body.money == "") {
 		req.session.error = "how much do you paid?";
-		res.send({error: "how much do you paid?"});
-		return ;
+		return res.send({error: "how much do you paid?"});
 	}
 
 	var members = req.body.members;
@@ -138,8 +125,7 @@ exports.charge = function(req, res){
 			req.session.succeed = "charge succeed!";
 		}
 	});
-	res.send({success: "success"});
-	return ;
+	return res.send({success: "success"});
 };
 
 exports.add = function(req, res){
@@ -166,8 +152,7 @@ exports.doAdd = function(req, res){
 	var email = req.body.email.match("[a-z0-9]+");
 	if (email == "" || req.body.name == "") {
 		req.session.error = "something missing!";
-		res.redirect("/");
-		return ;
+		return res.redirect("/");
 	}
 	if (req.body.initial == "") {
 		var initial = 0;
@@ -183,20 +168,33 @@ exports.doAdd = function(req, res){
 	Member.findOneByEmail(email, function (err, docs) {
 		if (docs) {
 			req.session.error = "this email has already been added!";
-			res.redirect('/');
-			return ;
+			return res.redirect('/');
 		} else {
 			Member.insert(member, function (err, docs) {
 				if (err) {
 					req.session.error = "add failed";
-					res.redirect('/');
-					return ;
+					return res.redirect('/');
 				} else {
 					req.session.succeed = "add succeed!";
-					res.redirect('/');
-					return ;
+					return res.redirect('/');
 				}
 			});
 		}
 	});
 };
+
+exports.email = function (req, res) {
+	var Email = require('email').Email
+	var myMsg = new Email({
+		from: "chenkan@baidu.com",
+		to:   "haodahaodaya_ya@163.com",
+		subject: "Knock knock...",
+		body: "Who's there?"
+	});
+	myMsg.send(function(err){
+		if (err)
+			res.send("wrong");
+		else
+			res.send("ok");
+	})
+}

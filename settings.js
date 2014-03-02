@@ -3,5 +3,6 @@ module.exports = {
 	db: "shpsaa",
 	port: "27017",
 	host: "localhost",
-	member_collection: "member"
+	member_collection: "member",
+	passcode: "shpsaa"
 }

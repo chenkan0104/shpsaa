@@ -9,6 +9,8 @@ var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 
+var settings = require('./settings.js');
+
 var app = express();
 
 // all environments
@@ -30,13 +32,18 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+var basicAuth = express.basicAuth(function (username, password) {
+	return username == settings.passname && password == settings.passcode;
+}, "Aha! Say the passcode!");
+
 app.get('/', routes.index);
-app.post('/charge', routes.charge);
+app.post('/charge', basicAuth, routes.charge);
 app.get('/detail/:email', routes.detail);
-app.post('/detail/:email', routes.update);
+app.post('/detail/:email', basicAuth, routes.update);
 app.get('/delete/:email', routes.delete);
 app.get('/add', routes.add);
-app.post('/add', routes.doAdd);
+app.post('/add', basicAuth, routes.doAdd);
+app.get('/email', routes.email);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

@@ -59,6 +59,7 @@
               </tr>
             </thead>
             <tbody>
+            <% members.sort(function (a, b) { return a.name<b.name; }); %>
             <% for (var i=0; i<members.length; i++) { %>
               <tr class="member">
                 <td><input type="checkbox" value="<%=members[i].email%>" checked></td>
