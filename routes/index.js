@@ -116,31 +116,34 @@ exports.charge = function(req, res){
 		Member.updateBalanceByEmail(members[i], -minus, function (err) {
 			if (err) {
 				req.session.error = "update failed";
+				return res.send({error: "update failed"});
 			}
 		});
 	};
 	Member.updateBalanceByEmail(payer, money, function (err) {
 		if (err) {
 			req.session.error = "update failed";
+			return res.send({error: "update failed"});
 		} else {
-			req.session.succeed = "charge succeed!";
+			req.session.success = "charge succeed!";
 		}
 	});
 	//send email
-	var emailTo = "";
+	var mailTo = "";
 	for (var i = members.length - 1; i >= 0; i--) {
 		if (i == members.length)
-			emailTo += members[i].email+"@baidu.com"
+			mailTo += members[i]+"@baidu.com"
 		else
-			emailTo += ", "+members[i].email+"@baidu.com";
+			mailTo += ", "+members[i]+"@baidu.com";
 	};
-	var mailText = payer.name+"付了"+money+"元\n";
+	var payerName = Member.findNameByEmail(payer);
+	var mailText = payerName+"付了"+money+"元\n";
 	mailText += "一起吃的有：\n";
 	for (var i = members.length - 1; i >= 0; i--) {
 		if (i == members.length)
-			mailText += members[i].name;
+			mailText += Member.findNameByEmail(members[i]);
 		else
-			mailText += ", "+members[i].name;
+			mailText += ", "+Member.findNameByEmail(members[i]);
 	};
 	var transport = nodemailer.createTransport("SMTP", {
 		service: "QQ",
@@ -151,7 +154,7 @@ exports.charge = function(req, res){
 	});
 	var mailOptions = {
 	    from: "***@qq.com",
-	    to: emailTo,
+	    to: mailTo,
 	    subject: "AA",
 	    text: mailText
 	};
@@ -159,10 +162,10 @@ exports.charge = function(req, res){
 	    transport.close();
 	    if(error){
 	    	req.session.error = "sending email wrong!";
-	    	return res.redirect('/');
+			return res.send({error: "sending email wrong!"});
 	    } else {
 	    	req.session.success = "charge succeed!";
-	    	return res.redirect('/');
+			return res.send({success: "charge succeed!"});
 	    }
 	});
 };

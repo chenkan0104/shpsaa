@@ -117,3 +117,22 @@ exports.findOneByEmail = function(email, callback) {
     });
   });
 };
+
+exports.findNameByEmail = function (email) {
+  var MongoClient = require('mongodb').MongoClient;
+  var format = require('util').format;
+
+  MongoClient.connect(mongod_path, function(err, db) {
+    if(err) throw err;
+
+    var collection = db.collection(member_collection);
+    collection.findOne({"email": email}, function(err, docs) {
+      db.close();
+      if (docs) {
+        return docs.name;
+      } else {
+        return null;
+      }
+    });
+  }); 
+}

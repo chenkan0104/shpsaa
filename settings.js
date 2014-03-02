@@ -4,5 +4,6 @@ module.exports = {
 	port: "27017",
 	host: "localhost",
 	member_collection: "member",
+	passname: "shps",
 	passcode: "shpsaa"
 }
