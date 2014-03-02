@@ -1,4 +1,5 @@
 var Member = require('../models/Member.js');
+var nodemailer = require("nodemailer");
 
 exports.index = function(req, res){
 	Member.findAll(function (err, docs) {
@@ -125,7 +126,45 @@ exports.charge = function(req, res){
 			req.session.succeed = "charge succeed!";
 		}
 	});
-	return res.send({success: "success"});
+	//send email
+	var emailTo = "";
+	for (var i = members.length - 1; i >= 0; i--) {
+		if (i == members.length)
+			emailTo += members[i].email+"@baidu.com"
+		else
+			emailTo += ", "+members[i].email+"@baidu.com";
+	};
+	var mailText = payer.name+"付了"+money+"元\n";
+	mailText += "一起吃的有：\n";
+	for (var i = members.length - 1; i >= 0; i--) {
+		if (i == members.length)
+			mailText += members[i].name;
+		else
+			mailText += ", "+members[i].name;
+	};
+	var transport = nodemailer.createTransport("SMTP", {
+		service: "QQ",
+		auth: {
+			user: "***@qq.com",
+			pass: "***"
+		}
+	});
+	var mailOptions = {
+	    from: "***@qq.com",
+	    to: emailTo,
+	    subject: "AA",
+	    text: mailText
+	};
+	transport.sendMail(mailOptions, function(error, response){
+	    transport.close();
+	    if(error){
+	    	req.session.error = "sending email wrong!";
+	    	return res.redirect('/');
+	    } else {
+	    	req.session.success = "charge succeed!";
+	    	return res.redirect('/');
+	    }
+	});
 };
 
 exports.add = function(req, res){
@@ -182,27 +221,3 @@ exports.doAdd = function(req, res){
 		}
 	});
 };
-
-exports.email = function (req, res) {
-	var nodemailer = require("nodemailer");
-	var transport = nodemailer.createTransport("SMTP", {
-	    host: "localhost",
-	    port: 25
-	});
-	var mailOptions = {
-	    from: "chenkan@baidu.com",
-	    to: "haodahaodaya_ya@163.com",
-	    subject: "Hello",
-	    text: "Hello world",
-	    html: "<b>Hello world</b>"
-	};
-	smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	    	res.send("wrong");
-	    }else{
-	    	res.send("success");
-	    }
-
-	    smtpTransport.close();
-	});
-}

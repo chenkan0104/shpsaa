@@ -43,7 +43,6 @@ app.post('/detail/:email', basicAuth, routes.update);
 app.get('/delete/:email', routes.delete);
 app.get('/add', routes.add);
 app.post('/add', basicAuth, routes.doAdd);
-app.get('/email', routes.email);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
