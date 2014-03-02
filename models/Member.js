@@ -45,6 +45,22 @@ exports.update = function(member, callback) {
   });
 };
 
+exports.updateBalanceByEmail = function(email, money, callback) {
+  var MongoClient = require('mongodb').MongoClient;
+  var format = require('util').format;
+
+  MongoClient.connect(mongod_path, function(err, db) {
+    if(err) throw err;
+
+    var collection = db.collection(member_collection);
+    collection.update({email: email}, {$inc: {balance: money}}, {w:1}, function(err) {
+      db.close();
+      if (err) callback(err);
+      else callback(null);
+    });
+  });
+};
+
 exports.deleteByEmail = function(email, callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;

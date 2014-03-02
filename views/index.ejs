@@ -13,13 +13,33 @@
   </head>
   <body>
   	<div class="container">
+      <% if (success) { %>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6 alert alert-success">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%=success%>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+      <% } %>
+      <% if (error) { %>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6 alert alert-danger">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <%=error%>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+      <% } %>
       <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-5">
-          <input type="text" class="form-control" placeholder="Search">
+          <input type="text" class="form-control" id="search" placeholder="Search" onkeyup="search(this.value);">
         </div>
         <div class="col-md-1">
-          <button class="btn btn-primary" onclick="return charge();">Charge</button>
+          <button class="btn btn-primary" onclick="chargeButton();">Charge</button>
         </div>
         <div class="col-md-3"></div>
       </div>
@@ -40,9 +60,9 @@
             </thead>
             <tbody>
             <% for (var i=0; i<members.length; i++) { %>
-              <tr>
-                <th><input type="checkbox"></th>
-                <td><a href=""><%=members[i].name%></a></td>
+              <tr class="member">
+                <td><input type="checkbox" value="<%=members[i].email%>" checked></td>
+                <td><a><%=members[i].name%></a></td>
                 <td>&yen;<%=members[i].balance%></td>
                 <td><a href="/detail/<%=members[i].email%>"><i class="glyphicon glyphicon-pencil"></i></a></td>
               </tr>
@@ -53,7 +73,110 @@
         <div class="col-md-3"></div>
       </div>
   	</div>
+    <div class="modal fade" id="chargeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Step 2 - Who paid the money?</h4>
+          </div>
+          <div class="modal-body" id="modal-body">
+            <select class="form-control" id="payer">
+              <% for (var i=0; i<members.length; i++) { %>
+                <option value="<%=members[i].email%>"><%=members[i].name%>&nbsp;&nbsp;(&yen;<%=members[i].balance%>)</option>
+              <% } %>
+            </select>
+            <br />
+            <label for="money">Money Paid</label>
+            <div class="input-group">
+              <span class="input-group-addon">&yen;</span>
+              <input type="text" id="money" name="money" class="form-control" placeholder="Money Paid">
+              <span class="input-group-addon">.00</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="return charge();">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      function chargeButton () {
+        $.each($("#modal-body option"), function (index, value) {
+          value.style.display = "";
+        })
+        var selected_number = 0;
+        $.each($(".member"), function (index, value) {
+          var input = value.children[0].children[0];
+          if (!input.checked) {
+            $.each($("#modal-body option"), function (index, value) {
+              if ((value.value+" "+value.innerHTML).match(input.value)) {
+                value.style.display = "none";
+              }
+            });
+          } else {
+            selected_number++;
+            $.each($("#modal-body option"), function (index, value) {
+              if (value.innerHTML.match(input.value)) {
+                value.style.display = "";
+              }
+            });
+          }
+        });
+        if (selected_number == 0)
+          alert("囧，先选几个人再说呀。")
+        else
+          $("#chargeModal").modal("show");
+      }
+      function search (str) {
+        var members = $(".member");
+        var hidden = [];
+        var results = [];
+
+        if (str == "") {
+          for (var i=0; i<members.length; i++) {
+            members[i].style.display = "";
+          }
+          return false;
+        }
+        for (var i=0; i<members.length; i++) {
+          members[i].style.display = "";
+          if (members[i].innerHTML.match(str)) {
+            results.push(members[i]);
+          } else {
+            hidden.push(members[i]);
+          }
+        }
+        hidden.forEach(function (node) {
+          node.style.display = "none";
+        });
+        return false;
+      }
+      function charge () {
+        var members = [];
+        $.each($(".member"), function (index, value) {
+          var input = value.children[0].children[0];
+          if (input.checked) {
+            members.push(input.value);
+          }
+        });
+        var payer = $("#payer").val();
+        var money = $("#money").val();
+        $.ajax({
+          url: '/charge',
+          type: "POST",
+          data: {payer: payer, members: members, money: money},
+          success: function () {
+            window.location = "/";
+          },
+          error: function () {
+            window.location = "/";
+          }
+        })
+      }
+    </script>
   </body>
 </html>
