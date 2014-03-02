@@ -184,17 +184,25 @@ exports.doAdd = function(req, res){
 };
 
 exports.email = function (req, res) {
-	var Email = require('email').Email
-	var myMsg = new Email({
-		from: "chenkan@baidu.com",
-		to:   "haodahaodaya_ya@163.com",
-		subject: "Knock knock...",
-		body: "Who's there?"
+	var nodemailer = require("nodemailer");
+	var transport = nodemailer.createTransport("SMTP", {
+	    host: "localhost",
+	    port: 25
 	});
-	myMsg.send(function(err){
-		if (err)
-			res.send("wrong");
-		else
-			res.send("ok");
-	})
+	var mailOptions = {
+	    from: "chenkan@baidu.com",
+	    to: "haodahaodaya_ya@163.com",
+	    subject: "Hello",
+	    text: "Hello world",
+	    html: "<b>Hello world</b>"
+	};
+	smtpTransport.sendMail(mailOptions, function(error, response){
+	    if(error){
+	    	res.send("wrong");
+	    }else{
+	    	res.send("success");
+	    }
+
+	    smtpTransport.close();
+	});
 }
