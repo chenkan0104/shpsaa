@@ -140,41 +140,46 @@ exports.charge = function(req, res){
 		var payerName = name;
 		var mailText = payerName+"付了"+money+"元\n";
 		mailText += "一起吃的有：\n";
-		for (var i = members.length - 1; i >= 0; i--) {
-			if (i == members.length-1) {
-				Member.findNameByEmail(members[i], function (err, name) {
+		var count = 0;
+		addName(members[count]);
+		function addName (email) {
+			Member.findNameByEmail(email, function (err, name) {
+				if (count == 0) {
 					mailText += name;
-				});
-			} else {
-				Member.findNameByEmail(members[i], function (err, name) {
+				} else {
 					mailText += ", "+name;
-				});
-			}
-		};
-		console.log(mailText);
-		var transport = nodemailer.createTransport("SMTP", {
-			service: "QQ",
-			auth: {
-				user: "***@qq.com",
-				pass: "***"
-			}
-		});
-		var mailOptions = {
-		    from: "***@qq.com",
-		    to: mailTo,
-		    subject: "AA",
-		    text: mailText
-		};
-		transport.sendMail(mailOptions, function(error, response){
-		    transport.close();
-		    if(error){
-		    	req.session.error = "sending email wrong!";
-				return res.send({error: "sending email wrong!"});
-		    } else {
-		    	req.session.success = "charge succeed!";
-				return res.send({success: "charge succeed!"});
-		    }
-		});
+				}
+				count++;
+				if (count == members.length) {
+					console.log(mailText);
+					var transport = nodemailer.createTransport("SMTP", {
+						service: "QQ",
+						auth: {
+							user: "***@qq.com",
+							pass: "***"
+						}
+					});
+					var mailOptions = {
+					    from: "***@qq.com",
+					    to: mailTo,
+					    subject: "AA",
+					    text: mailText
+					};
+					transport.sendMail(mailOptions, function(error, response){
+					    transport.close();
+					    if(error){
+					    	req.session.error = "sending email wrong!";
+							return res.send({error: "sending email wrong!"});
+					    } else {
+					    	req.session.success = "charge succeed!";
+							return res.send({success: "charge succeed!"});
+					    }
+					});
+					return;
+				}
+				addName(members[count]);
+			});
+		}
 	});
 };
 
