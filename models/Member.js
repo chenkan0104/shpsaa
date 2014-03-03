@@ -118,7 +118,7 @@ exports.findOneByEmail = function(email, callback) {
   });
 };
 
-exports.findNameByEmail = function (email) {
+exports.findNameByEmail = function (email, callback) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
 
@@ -129,9 +129,9 @@ exports.findNameByEmail = function (email) {
     collection.findOne({"email": email}, function(err, docs) {
       db.close();
       if (docs) {
-        return docs.name;
+        callback(err, docs.name);
       } else {
-        return null;
+        callback(err, null);
       }
     });
   }); 

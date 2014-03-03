@@ -131,42 +131,50 @@ exports.charge = function(req, res){
 	//send email
 	var mailTo = "";
 	for (var i = members.length - 1; i >= 0; i--) {
-		if (i == members.length)
+		if (i == members.length-1)
 			mailTo += members[i]+"@baidu.com"
 		else
 			mailTo += ", "+members[i]+"@baidu.com";
 	};
-	var payerName = Member.findNameByEmail(payer);
-	var mailText = payerName+"付了"+money+"元\n";
-	mailText += "一起吃的有：\n";
-	for (var i = members.length - 1; i >= 0; i--) {
-		if (i == members.length)
-			mailText += Member.findNameByEmail(members[i]);
-		else
-			mailText += ", "+Member.findNameByEmail(members[i]);
-	};
-	var transport = nodemailer.createTransport("SMTP", {
-		service: "QQ",
-		auth: {
-			user: "***@qq.com",
-			pass: "***"
-		}
-	});
-	var mailOptions = {
-	    from: "***@qq.com",
-	    to: mailTo,
-	    subject: "AA",
-	    text: mailText
-	};
-	transport.sendMail(mailOptions, function(error, response){
-	    transport.close();
-	    if(error){
-	    	req.session.error = "sending email wrong!";
-			return res.send({error: "sending email wrong!"});
-	    } else {
-	    	req.session.success = "charge succeed!";
-			return res.send({success: "charge succeed!"});
-	    }
+	Member.findNameByEmail(payer, function (err, name) {
+		var payerName = name;
+		var mailText = payerName+"付了"+money+"元\n";
+		mailText += "一起吃的有：\n";
+		for (var i = members.length - 1; i >= 0; i--) {
+			if (i == members.length-1) {
+				Member.findNameByEmail(members[i], function (err, name) {
+					mailText += name;
+				});
+			} else {
+				Member.findNameByEmail(members[i], function (err, name) {
+					mailText += ", "+name;
+				});
+			}
+		};
+		console.log(mailText);
+		var transport = nodemailer.createTransport("SMTP", {
+			service: "QQ",
+			auth: {
+				user: "***@qq.com",
+				pass: "***"
+			}
+		});
+		var mailOptions = {
+		    from: "***@qq.com",
+		    to: mailTo,
+		    subject: "AA",
+		    text: mailText
+		};
+		transport.sendMail(mailOptions, function(error, response){
+		    transport.close();
+		    if(error){
+		    	req.session.error = "sending email wrong!";
+				return res.send({error: "sending email wrong!"});
+		    } else {
+		    	req.session.success = "charge succeed!";
+				return res.send({success: "charge succeed!"});
+		    }
+		});
 	});
 };
 
