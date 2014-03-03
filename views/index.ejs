@@ -52,17 +52,17 @@
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="col-md-2"><input type="checkbox" checked></th>
+                <th class="col-md-2"><input id="all" type="checkbox" checked></th>
                 <th>top</th>
                 <th>balance</th>
                 <th><a href="/add"><i class="glyphicon glyphicon-plus-sign"></i></a></th>
               </tr>
             </thead>
             <tbody>
-            <% members.sort(function (a, b) { return a.name<b.name; }); %>
+            <% members.sort(function (a, b) { return a.balance>b.balance; }); %>
             <% for (var i=0; i<members.length; i++) { %>
               <tr class="member">
-                <td><input type="checkbox" value="<%=members[i].email%>" checked></td>
+                <td><input class="single" type="checkbox" value="<%=members[i].email%>" checked></td>
                 <td><a><%=members[i].name%></a></td>
                 <td>&yen;<%=members[i].balance%></td>
                 <td><a href="/detail/<%=members[i].email%>"><i class="glyphicon glyphicon-pencil"></i></a></td>
@@ -178,6 +178,27 @@
           }
         })
       }
+      $(".single").change(function () {
+        var boo = true;
+        $.each($(".single"), function (index, value) {
+          if (!value.checked) {
+            boo = false;
+          }
+        });
+        if (boo) $("#all").prop("checked", true);
+        else $("#all").prop("checked", false);
+      });
+      $("#all").change(function () {
+        if ($("#all").is(":checked")) {
+          $.each($(".single"), function (index, value) {
+            value.checked = true;
+          });
+        } else {
+          $.each($(".single"), function (index, value) {
+            value.checked = false;
+          });
+        }
+      });
     </script>
   </body>
 </html>

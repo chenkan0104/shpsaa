@@ -138,8 +138,8 @@ exports.charge = function(req, res){
 	};
 	Member.findNameByEmail(payer, function (err, name) {
 		var payerName = name;
-		var mailText = payerName+"付了"+money+"元\n";
-		mailText += "一起吃的有：\n";
+		var mailHtml = "<h3>"+payerName+"付了"+money+"元</h3>";
+		mailText += "<h5>一起吃的有：";
 		var count = 0;
 		addName(members[count]);
 		function addName (email) {
@@ -161,8 +161,9 @@ exports.charge = function(req, res){
 					var mailOptions = {
 					    from: "***@qq.com",
 					    to: mailTo,
-					    subject: "AA",
-					    text: mailText
+					    headers: "MIME-Version: 1.0\r\nContent-type:text/html;charset=gb2312\r\n",
+					    subject: payerName+"付了"+money+"元",
+					    html: mailHtml+"</h5>"
 					};
 					transport.sendMail(mailOptions, function(error, response){
 					    transport.close();
