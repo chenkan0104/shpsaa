@@ -139,15 +139,15 @@ exports.charge = function(req, res){
 	Member.findNameByEmail(payer, function (err, name) {
 		var payerName = name;
 		var mailHtml = "<h3>"+payerName+"付了"+money+"元</h3>";
-		mailText += "<h5>一起吃的有：";
+		mailHtml += "<h5>一起吃的有：";
 		var count = 0;
 		addName(members[count]);
 		function addName (email) {
 			Member.findNameByEmail(email, function (err, name) {
 				if (count == 0) {
-					mailText += name;
+					mailHtml += name;
 				} else {
-					mailText += ", "+name;
+					mailHtml += ", "+name;
 				}
 				count++;
 				if (count == members.length) {
