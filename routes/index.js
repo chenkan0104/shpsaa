@@ -151,7 +151,6 @@ exports.charge = function(req, res){
 				}
 				count++;
 				if (count == members.length) {
-					console.log(mailText);
 					var transport = nodemailer.createTransport("SMTP", {
 						service: "QQ",
 						auth: {
