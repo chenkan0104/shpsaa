@@ -13,6 +13,29 @@
   </head>
   <body>
   	<div class="container">
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <div class="pull-right">
+            <button type="button" class="btn btn-danger" onclick="return rollbackButton();">RollBack</button>
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-default" onclick="return addToBookMark();">
+              <span class="glyphicon glyphicon-star"></span> Star
+            </button>
+          </div>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <blockquote>
+            <p><%= zen %></p>
+          </blockquote>
+          <hr />
+        </div>
+        <div class="col-md-3"></div>
+      </div> 
       <% if (success) { %>
       <div class="row">
         <div class="col-md-3"></div>
@@ -64,12 +87,30 @@
               <tr class="member">
                 <td><input class="single" type="checkbox" value="<%=members[i].email%>" checked></td>
                 <td><a><%=members[i].name%></a></td>
-                <td>&yen;<%=members[i].balance%></td>
+                <td>&yen;<%=Math.round(members[i].balance*1000000)/1000000%></td>
                 <td><a href="/detail/<%=members[i].email%>"><i class="glyphicon glyphicon-pencil"></i></a></td>
               </tr>
             <% } %>
             </tbody>
           </table>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <hr />
+          <h3>How to use <abbr title="an AA method for baidu shanghai ps team" class="initialism">AA</abbr>:</h3>
+          <ol>
+            <li>Check the checkbox of each one who have eaten the meal.</li>
+            <li>Select the one who paid the money.</li>
+            <li>Input the amount of money that was paid.</li>
+            <li>Press the 「Continue」 button.</li>
+            <li>If you are required for PASSCODE for authentication,<br />please contact: <a href="mailto:chenkan@baidu.com">陈侃</a> or <a href="mailto:qujingying@baidu.com">曲晶莹</a></li>
+          </ol>
+          <hr />
+          <h4 class="text-warning"><strong>Note that:</strong> Emails will be sent to those who have eaten the meal.</h4>
+          <h4 class="text-danger"><strong>Be careful</strong> when you select who have enjoied the meal!!!</h4>
         </div>
         <div class="col-md-3"></div>
       </div>
@@ -98,6 +139,29 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" onclick="return charge();">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="rollbackModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Rollback to When?</h4>
+          </div>
+          <div class="modal-body" id="modal-body">
+            <h4 class="text-danger"><b>This is Dangerous!!!</b></h4>
+            <select class="form-control" id="time">
+              <% for (var i=0; i<backups.length; i++) { %>
+              <% var date = new Date(parseInt(backups[i].time)).toString(); %>
+                <option value="<%=backups[i]%>"><%=date%></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" onclick="return rollback();">RollBack</button>
           </div>
         </div>
       </div>
@@ -199,6 +263,18 @@
           });
         }
       });
+      function addToBookMark() {
+        if (confirm("Are you sure you want to add this site to your bookmark?")) {
+          window.external.addFavorite(this.href,this.title);
+        }
+        return false;
+      }
+      function rollbackButton () {
+        $("#rollbackModal").modal("show"); 
+      }
+      function rollback () {
+        alert($("#time").val());
+      }
     </script>
   </body>
 </html>

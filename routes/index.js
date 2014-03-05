@@ -1,29 +1,45 @@
 var Member = require('../models/Member.js');
+var BackupDB = require('../models/BackupDB.js');
 var nodemailer = require("nodemailer");
+var exec = require('child_process').exec;
 
 exports.index = function(req, res){
-	Member.findAll(function (err, docs) {
+	Member.findAll(function (err, members) {
 		if (err) {
 			req.session.error = "something wrong!";
 			return res.redirect('/');
 		} else {
-			if (typeof(req.session.success) != 'undefined') {
-				var success = req.session.success;
-				req.session.success = null;
-			} else {
-				var success = null;
-			}
-			if (typeof(req.session.error) != 'undefined') {
-				var error = req.session.error;
-				req.session.error = null;
-			} else {
-				var error = null;
-			}
-			res.render('index', {
-				title: 'AA',
-				members: docs,
-				success: success,
-				error: error
+			BackupDB.findAllBackup(function (err, backups) {
+				if (err) {
+					req.session.error = "something wrong!";
+					return res.redirect('/');
+				} else {
+					if (typeof(req.session.success) != 'undefined') {
+						var success = req.session.success;
+						req.session.success = null;
+					} else {
+						var success = null;
+					}
+					if (typeof(req.session.error) != 'undefined') {
+						var error = req.session.error;
+						req.session.error = null;
+					} else {
+						var error = null;
+					}
+					var zen = "";
+					cmd = 'curl https://api.github.com/zen';
+					exec(cmd, function callback(error, stdout, stderr) {
+						zen = stdout;
+						res.render('index', {
+							title: 'AA',
+							members: members,
+							backups: backups,
+							zen: zen,
+							success: success,
+							error: error
+						});
+					});
+				}
 			});
 		}
 	});
@@ -108,76 +124,83 @@ exports.charge = function(req, res){
 		return res.send({error: "how much do you paid?"});
 	}
 
-	var members = req.body.members;
-	var payer = req.body.payer;
-	var money = parseInt(req.body.money);
-	var minus = money/members.length;
-	for (var i = members.length - 1; i >= 0; i--) {
-		Member.updateBalanceByEmail(members[i], -minus, function (err) {
-			if (err) {
-				req.session.error = "update failed";
-				return res.send({error: "update failed"});
-			}
-		});
-	};
-	Member.updateBalanceByEmail(payer, money, function (err) {
+	backupDB(function (err) {
 		if (err) {
-			req.session.error = "update failed";
-			return res.send({error: "update failed"});
+			req.session.err = "backup database failed!";
+			return res.send({error: "backup database failed!"});
 		} else {
-			req.session.success = "charge succeed!";
-		}
-	});
-	//send email
-	var mailTo = "";
-	for (var i = members.length - 1; i >= 0; i--) {
-		if (i == members.length-1)
-			mailTo += members[i]+"@baidu.com"
-		else
-			mailTo += ", "+members[i]+"@baidu.com";
-	};
-	Member.findNameByEmail(payer, function (err, name) {
-		var payerName = name;
-		var mailHtml = "<h3>"+payerName+"付了"+money+"元</h3>";
-		mailHtml += "<h5>一起吃的有：";
-		var count = 0;
-		addName(members[count]);
-		function addName (email) {
-			Member.findNameByEmail(email, function (err, name) {
-				if (count == 0) {
-					mailHtml += name;
+			var members = req.body.members;
+			var payer = req.body.payer;
+			var money = parseInt(req.body.money);
+			var minus = money/members.length;
+			for (var i = members.length - 1; i >= 0; i--) {
+				Member.updateBalanceByEmail(members[i], -minus, function (err) {
+					if (err) {
+						req.session.error = "update failed";
+						return res.send({error: "update failed"});
+					}
+				});
+			};
+			Member.updateBalanceByEmail(payer, money, function (err) {
+				if (err) {
+					req.session.error = "update failed";
+					return res.send({error: "update failed"});
 				} else {
-					mailHtml += ", "+name;
+					req.session.success = "charge succeed!";
 				}
-				count++;
-				if (count == members.length) {
-					var transport = nodemailer.createTransport("SMTP", {
-						service: "QQ",
-						auth: {
-							user: "***@qq.com",
-							pass: "***"
-						}
-					});
-					var mailOptions = {
-					    from: "***@qq.com",
-					    to: mailTo,
-					    headers: "MIME-Version: 1.0\r\nContent-type:text/html;charset=gb2312\r\n",
-					    subject: payerName+"付了"+money+"元",
-					    html: mailHtml+"</h5>"
-					};
-					transport.sendMail(mailOptions, function(error, response){
-					    transport.close();
-					    if(error){
-					    	req.session.error = "sending email wrong!";
-							return res.send({error: "sending email wrong!"});
-					    } else {
-					    	req.session.success = "charge succeed!";
-							return res.send({success: "charge succeed!"});
-					    }
-					});
-					return;
-				}
+			});
+			//send email
+			var mailTo = "";
+			for (var i = members.length - 1; i >= 0; i--) {
+				if (i == members.length-1)
+					mailTo += members[i]+"@baidu.com"
+				else
+					mailTo += ", "+members[i]+"@baidu.com";
+			};
+			Member.findNameByEmail(payer, function (err, name) {
+				var payerName = name;
+				var mailHtml = "<h3>"+payerName+"付了"+money+"元</h3>";
+				mailHtml += "<h5>一起吃的有：";
+				var count = 0;
 				addName(members[count]);
+				function addName (email) {
+					Member.findNameByEmail(email, function (err, name) {
+						if (count == 0) {
+							mailHtml += name;
+						} else {
+							mailHtml += ", "+name;
+						}
+						count++;
+						if (count == members.length) {
+							var transport = nodemailer.createTransport("SMTP", {
+								service: "QQ",
+								auth: {
+									user: "***@qq.com",
+									pass: "***"
+								}
+							});
+							var mailOptions = {
+							    from: "***@qq.com",
+							    to: mailTo,
+							    headers: "MIME-Version: 1.0\r\nContent-type:text/html;charset=gb2312\r\n",
+							    subject: payerName+"付了"+money+"元",
+							    html: mailHtml+"</h5>"
+							};
+							transport.sendMail(mailOptions, function(error, response){
+							    transport.close();
+							    if(error){
+							    	req.session.error = "sending email wrong!";
+										return res.send({error: "sending email wrong!"});
+							    } else {
+							    	req.session.success = "charge succeed!";
+										return res.send({success: "charge succeed!"});
+							    }
+							});
+							return;
+						}
+						addName(members[count]);
+					});
+				}
 			});
 		}
 	});
@@ -237,3 +260,59 @@ exports.doAdd = function(req, res){
 		}
 	});
 };
+
+exports.rollback = function (req, res) {
+	var time = req.params.time;
+	if (time == "") {
+		req.session.error = "something missing!";
+		return res.redirect('/');
+	} else {
+		BackupDB.findBackupByTime(time, function (err, docs) {
+			if (err) {
+				req.session.error = "Find backup error!";
+				return res.redirect('/');
+			} else {
+				if (docs == null) {
+					req.session.error = "No such rollback!";
+					return res.redirect('/');
+				}
+				var members = [];
+				for (var i = docs.data.length - 1; i >= 0; i--) {
+					members.push(docs.data[i]);
+				}
+				BackupDB.saveMembers(members, function (err, temp) {
+					if (err) {
+						req.session.error = "rollback error!";
+						res.redirect('/');
+					} else {
+						req.session.success = "rollback succeed!   ----- those who added after this backup would not be deleted!";
+						res.redirect('/');
+					}
+				});
+			}
+		});
+	}
+}
+
+function backupDB (callback) {
+	var date = new Date();
+	var time = date.getTime();
+
+	Member.findAll(function (err, docs) {
+		if (err) {
+			callback(err);
+		} else {
+			var backup = {
+				time: time,
+				data: docs
+			};
+			BackupDB.insertBackup(backup, function (err, docs) {
+				if (err) {
+					callback(err);
+				} else {
+					callback(null);
+				}
+			});
+		}
+	});
+}

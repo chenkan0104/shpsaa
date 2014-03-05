@@ -135,4 +135,4 @@ exports.findNameByEmail = function (email, callback) {
       }
     });
   }); 
-}
+};
