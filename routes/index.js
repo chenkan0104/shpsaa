@@ -212,7 +212,7 @@ exports.doAdd = function(req, res){
 	if (req.body.initial == "") {
 		var initial = 0;
 	} else {
-		var initial = parseInt(req.body.initial);
+		var initial = parseFloat(req.body.initial);
 	}
 	var member = {
 		email: email,
