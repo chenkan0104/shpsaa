@@ -265,16 +265,16 @@ exports.rollback = function (req, res) {
 	var time = req.params.time;
 	if (time == "") {
 		req.session.error = "something missing!";
-		return res.redirect('/');
+		return res.send({error: "something missing!"});
 	} else {
 		BackupDB.findBackupByTime(time, function (err, docs) {
 			if (err) {
 				req.session.error = "Find backup error!";
-				return res.redirect('/');
+				return res.send({error: "Find backup error!"});
 			} else {
 				if (docs == null) {
 					req.session.error = "No such rollback!";
-					return res.redirect('/');
+					return res.send({error: "No such rollback!"});
 				}
 				var members = [];
 				for (var i = docs.data.length - 1; i >= 0; i--) {
@@ -283,10 +283,10 @@ exports.rollback = function (req, res) {
 				BackupDB.saveMembers(members, function (err, temp) {
 					if (err) {
 						req.session.error = "rollback error!";
-						res.redirect('/');
+						return res.send({error: "rollback error!"});
 					} else {
 						req.session.success = "rollback succeed!   ----- those who added after this backup would not be deleted!";
-						res.redirect('/');
+						return res.send({success: "rollback succeed!   ----- those who added after this backup would not be deleted!"});
 					}
 				});
 			}

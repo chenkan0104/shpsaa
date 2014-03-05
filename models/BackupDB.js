@@ -69,7 +69,6 @@ exports.saveMembers = function (members, callback) {
 
     var collection = db.collection(member_collection);
     var i = 0;
-    console.log(members.length);
     saveMember(members[i]);
     function saveMember (member) {
       collection.save(member, function (err, docs) {
@@ -77,11 +76,11 @@ exports.saveMembers = function (members, callback) {
           callback(err, null);
         } else {
           i++;
-          console.log(i);
           if (i == members.length) {
             callback(err, docs);
+          } else {
+            saveMember(members[i]);
           }
-          saveMember(members[i]);
         }
       });
     }
