@@ -6,5 +6,6 @@ module.exports = {
 	member_collection: "member",
 	backup_collection: "backup_db",
 	passname: "shps",
-	passcode: "shpsaa"
+	passcode: "shpsaa",
+	advancedPasscode: "shpsab"
 }
