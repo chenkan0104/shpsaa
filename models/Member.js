@@ -136,3 +136,29 @@ exports.findNameByEmail = function (email, callback) {
     });
   }); 
 };
+
+exports.getSortedMembers = function (callback) {
+  var MongoClient = require('mongodb').MongoClient;
+  var format = require('util').format;
+
+  MongoClient.connect(mongod_path, function(err, db) {
+    if(err) throw err;
+
+    var collection = db.collection(member_collection);
+    collection.find().toArray(function(err, docs) {
+      db.close();
+      if (err) {
+        callback(err, null);
+      } else {
+        docs.sort(function (a, b) {
+          return a.balance>b.balance;
+        });
+        var ret = [];
+        for (var i = docs.length - 1; i >= 0; i--) {
+          ret.push(docs[i]);
+        };
+        callback(err, ret);
+      }
+    });
+  }); 
+}

@@ -1,7 +1,7 @@
 var Member = require('../models/Member.js');
 var BackupDB = require('../models/BackupDB.js');
 var nodemailer = require("nodemailer");
-var exec = require('child_process').exec;
+// var exec = require('child_process').exec;
 
 exports.index = function(req, res){
 	Member.findAll(function (err, members) {
@@ -26,19 +26,19 @@ exports.index = function(req, res){
 					} else {
 						var error = null;
 					}
-					var zen = "";
-					cmd = 'curl https://api.github.com/zen';
-					exec(cmd, function callback(error, stdout, stderr) {
-						zen = stdout;
-						res.render('index', {
-							title: 'AA',
-							members: members,
-							backups: backups,
-							zen: zen,
-							success: success,
-							error: error
-						});
+					// var zen = "";
+					// cmd = 'curl https://api.github.com/zen';
+					// exec(cmd, function callback(error, stdout, stderr) {
+					// 	zen = stdout;
+					res.render('index', {
+						title: 'AA',
+						members: members,
+						backups: backups,
+						// zen: zen,
+						success: success,
+						error: error
 					});
+					// });
 				}
 			});
 		}
@@ -172,31 +172,39 @@ exports.charge = function(req, res){
 						}
 						count++;
 						if (count == members.length) {
-							var transport = nodemailer.createTransport("SMTP", {
-								service: "QQ",
-								auth: {
-									user: "***@qq.com",
-									pass: "***"
-								}
+							mailHtml += "</h5>";
+							mailHtml += "<br />";
+							mailHtml += "<h5>现在的余额顺序：</h5>";
+							Member.getSortedMembers(function (err, docs) {
+								for (var i = docs.length - 1; i >= 0; i--) {
+									if (i == docs.length-1) {
+										mailHtml += docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;"+docs[i].balance+"<br />";
+									} else {
+										mailHtml += ", "+docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;"+docs[i].balance+"<br />";
+									}
+								};
+								var transport = nodemailer.createTransport("SMTP", {
+									host: "hostswap-in.baidu.com"
+								});
+								var mailOptions = {
+								    from: "se-sh@baidu.com",
+								    to: mailTo,
+								    headers: "MIME-Version: 1.0\r\nContent-type:text/html;charset=gb2312\r\n",
+								    subject: payerName+"付了"+money+"元",
+								    html: mailHtml
+								};
+								transport.sendMail(mailOptions, function(error, response){
+								    transport.close();
+								    if(error){
+								    	req.session.error = "sending email wrong!";
+											return res.send({error: "sending email wrong!"});
+								    } else {
+								    	req.session.success = "charge succeed!";
+											return res.send({success: "charge succeed!"});
+								    }
+								});
+								return;
 							});
-							var mailOptions = {
-							    from: "***@qq.com",
-							    to: mailTo,
-							    headers: "MIME-Version: 1.0\r\nContent-type:text/html;charset=gb2312\r\n",
-							    subject: payerName+"付了"+money+"元",
-							    html: mailHtml+"</h5>"
-							};
-							transport.sendMail(mailOptions, function(error, response){
-							    transport.close();
-							    if(error){
-							    	req.session.error = "sending email wrong!";
-										return res.send({error: "sending email wrong!"});
-							    } else {
-							    	req.session.success = "charge succeed!";
-										return res.send({success: "charge succeed!"});
-							    }
-							});
-							return;
 						}
 						addName(members[count]);
 					});

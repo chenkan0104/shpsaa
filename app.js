@@ -36,14 +36,18 @@ var basicAuth = express.basicAuth(function (username, password) {
 	return username == settings.passname && password == settings.passcode;
 }, "Aha! Say the passcode!");
 
+var advancedAuth = express.basicAuth(function (username, password) {
+	return username == settings.passname && password == settings.advancedPasscode;
+}, "Aha! Say the passcode!");
+
 app.get('/', routes.index);
 app.post('/charge', basicAuth, routes.charge);
 app.get('/detail/:email', routes.detail);
-app.post('/detail/:email', basicAuth, routes.update);
-app.get('/delete/:email', routes.delete);
+app.post('/detail/:email', advancedAuth, routes.update);
+app.get('/delete/:email', advancedAuth, routes.delete);
 app.get('/add', routes.add);
-app.post('/add', basicAuth, routes.doAdd);
-app.get('/rollback/:time', basicAuth, routes.rollback);
+app.post('/add', advancedAuth, routes.doAdd);
+app.get('/rollback/:time', advancedAuth, routes.rollback);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
