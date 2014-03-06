@@ -176,12 +176,8 @@ exports.charge = function(req, res){
 							mailHtml += "<br />";
 							mailHtml += "<h5>现在的余额顺序：</h5>";
 							Member.getSortedMembers(function (err, docs) {
-								for (var i = docs.length - 1; i >= 0; i--) {
-									if (i == docs.length-1) {
-										mailHtml += docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;"+docs[i].balance+"<br />";
-									} else {
-										mailHtml += ", "+docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;"+docs[i].balance+"<br />";
-									}
+								for (var i = 0; i <= docs.length-1; i++) {
+									mailHtml += i+1 + ". "+docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;&nbsp;"+Math.round(docs[i].balance*1000000)/1000000+"<br />";
 								};
 								var transport = nodemailer.createTransport("SMTP", {
 									host: "hostswap-in.baidu.com"

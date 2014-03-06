@@ -151,7 +151,7 @@ exports.getSortedMembers = function (callback) {
         callback(err, null);
       } else {
         docs.sort(function (a, b) {
-          return a.balance>b.balance;
+          return a.balance<b.balance;
         });
         var ret = [];
         for (var i = docs.length - 1; i >= 0; i--) {
