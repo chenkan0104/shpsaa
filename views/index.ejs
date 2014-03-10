@@ -154,8 +154,8 @@
             </select>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-danger" onclick="return rollback();">RollBack</button>
+            <button type="button" id="continue" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="rollback" class="btn btn-danger" onclick="return rollback();">RollBack</button>
           </div>
         </div>
       </div>
@@ -224,14 +224,21 @@
         });
         var payer = $("#payer").val();
         var money = $("#money").val();
+        if (money == "") {
+          alert("亲~ 先告诉我花了多少钱嘛！");
+        }
+        var continueBtn = $("#continue");
+        continueBtn.prop("disabled", true);
         $.ajax({
           url: '/charge',
           type: "POST",
           data: {payer: payer, members: members, money: money},
           success: function () {
+            continueBtn.prop("disabled", false);
             window.location = "/";
           },
           error: function () {
+            continueBtn.prop("disabled", false);
             window.location = "/";
           }
         })
@@ -282,13 +289,17 @@
           return false;
         }
         var url = '/rollback/'+time;
+        var rollbackBtn = $("#rollback");
+        rollbackBtn.prop("disabled", true);
         $.ajax({
           url: url,
           type: 'get',
           success: function (json) {
+            rollbackBtn.prop("disabled", false);
             window.location = '/';
           },
           error: function (json) {
+            rollbackBtn.prop("disabled", false);
             window.location = '/';
           }
         });
