@@ -116,7 +116,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title" id="myModalLabel">Step 2 - Who paid the money?</h4>
           </div>
-          <div class="modal-body" id="modal-body">
+          <div class="modal-body" id="modal-body-charge">
             <select class="form-control" id="payer">
               <% for (var i=0; i<members.length; i++) { %>
                 <option value="<%=members[i].email%>"><%=members[i].name%>&nbsp;&nbsp;(&yen;<%=members[i].balance%>)</option>
@@ -132,7 +132,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" onclick="return charge();">Continue</button>
+            <button type="button" id="continue" class="btn btn-primary" onclick="return charge();">Continue</button>
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h4 class="modal-title" id="myModalLabel">Rollback to When?</h4>
           </div>
-          <div class="modal-body" id="modal-body">
+          <div class="modal-body" id="modal-body-rollback">
             <h4 class="text-danger"><b>This is Dangerous!!!</b></h4>
             <select class="form-control" id="time">
               <% for (var i=0; i<backups.length; i++) { %>
@@ -154,7 +154,7 @@
             </select>
           </div>
           <div class="modal-footer">
-            <button type="button" id="continue" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             <button type="button" id="rollback" class="btn btn-danger" onclick="return rollback();">RollBack</button>
           </div>
         </div>
@@ -164,22 +164,25 @@
     <script src="/js/bootstrap.min.js"></script>
     <script type="text/javascript">
       function chargeButton () {
-        $.each($("#modal-body option"), function (index, value) {
+        $.each($("#modal-body-charge option"), function (index, value) {
           value.style.display = "";
         })
         var selected_number = 0;
         $.each($(".member"), function (index, value) {
           var input = value.children[0].children[0];
           if (!input.checked) {
-            $.each($("#modal-body option"), function (index, value) {
+            $.each($("#modal-body-charge option"), function (index, value) {
               if ((value.value+" "+value.innerHTML).match(input.value)) {
                 value.style.display = "none";
               }
             });
           } else {
             selected_number++;
-            $.each($("#modal-body option"), function (index, value) {
-              if (value.innerHTML.match(input.value)) {
+            $.each($("#modal-body-charge option"), function (index, value) {
+              if (value.value.match(input.value)) {
+                if (selected_number == 1) {
+                  value.selected = true;
+                }
                 value.style.display = "";
               }
             });
@@ -226,6 +229,7 @@
         var money = $("#money").val();
         if (money == "") {
           alert("亲~ 先告诉我花了多少钱嘛！");
+          return false;
         }
         var continueBtn = $("#continue");
         continueBtn.prop("disabled", true);
@@ -266,12 +270,11 @@
       });
       function addToBookMark() {
         if (confirm("Are you sure you want to add this site to your bookmark?")) {
-          // window.external.addFavorite(this.href,this.title);
           try {
-            window.external.addFavorite(URL, title);         //ie
+            window.external.addFavorite("http://cq01-2011q3-setest3-20.vm.baidu.com:8081/", "AA");         //ie
           } catch(e) {
             try {
-              window.sidebar.addPanel(title, URL, "");       //firefox
+              window.sidebar.addPanel("AA", "http://cq01-2011q3-setest3-20.vm.baidu.com:8081/", "");       //firefox
             } catch(e) {
                 alert("加入收藏失败，请使用Ctrl+D进行添加");     //chrome opera safari
             }
