@@ -27,7 +27,7 @@
         <div class="col-md-3"></div>
         <div class="col-md-6">
           <hr />
-          <blockquote>
+          <blockquote id="blockquote" style="display: none;">
             <p id="zen"></p>
           </blockquote>
         </div>
@@ -320,6 +320,7 @@
           crossDomain: true,
           success: function (text) {
             $("#zen").html(text);
+            $("#blockquote").css("display", "block");
           }
         });
       });
