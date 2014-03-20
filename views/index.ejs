@@ -26,7 +26,9 @@
       <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-6">
-          <hr />
+          <blockquote>
+            <p id="zen"></p>
+          </blockquote>
         </div>
         <div class="col-md-3"></div>
       </div>
@@ -310,6 +312,16 @@
         });
         return false;
       }
+      $(document).ready(function () {
+        $.ajax({
+          type: "GET",
+          url: "https://api.github.com/zen",
+          crossDomain: true,
+          success: function (text) {
+            $("#zen").html(text);
+          }
+        });
+      });
     </script>
   </body>
 </html>
