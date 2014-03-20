@@ -73,10 +73,12 @@ exports.saveMembers = function (members, callback) {
     function saveMember (member) {
       collection.save(member, function (err, docs) {
         if (err) {
+          db.close();
           callback(err, null);
         } else {
           i++;
           if (i == members.length) {
+            db.close();
             callback(err, docs);
           } else {
             saveMember(members[i]);
