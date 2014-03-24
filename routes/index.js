@@ -176,7 +176,7 @@ exports.charge = function(req, res){
 							mailHtml += "<br />";
 							mailHtml += "<h5>现在的余额顺序：</h5>";
 							Member.getSortedMembers(function (err, docs) {
-								for (var i = 0; i <= docs.length-1; i++) {
+								for (var i = 0; i < docs.length; i++) {
 									mailHtml += i+1 + ". "+docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;&nbsp;"+Math.round(docs[i].balance*1000000)/1000000+"<br />";
 								};
 								var transport = nodemailer.createTransport("SMTP", {
@@ -201,8 +201,9 @@ exports.charge = function(req, res){
 								});
 								return;
 							});
+						} else {
+							addName(members[count]);
 						}
-						addName(members[count]);
 					});
 				}
 			});
