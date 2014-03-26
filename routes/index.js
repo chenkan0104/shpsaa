@@ -180,7 +180,7 @@ exports.charge = function(req, res){
 									mailHtml += i+1 + ". "+docs[i].name+"&nbsp;&nbsp;&nbsp;&nbsp;&yen;&nbsp;"+Math.round(docs[i].balance*1000000)/1000000+"<br />";
 								};
 								var transport = nodemailer.createTransport("SMTP", {
-									host: "hostswap-in.baidu.com"
+									host: "hotswap-in.baidu.com"
 								});
 								var mailOptions = {
 								    from: "se-sh@baidu.com",
