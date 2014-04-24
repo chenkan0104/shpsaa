@@ -1,10 +1,9 @@
 var Member = require('../models/Member.js');
 var BackupDB = require('../models/BackupDB.js');
 var nodemailer = require("nodemailer");
-// var exec = require('child_process').exec;
 
 exports.index = function(req, res){
-	Member.findAll(function (err, members) {
+	Member.getSortedMembers(function (err, members) {
 		if (err) {
 			req.session.error = "something wrong!";
 			return res.redirect('/');
@@ -26,19 +25,13 @@ exports.index = function(req, res){
 					} else {
 						var error = null;
 					}
-					// var zen = "";
-					// cmd = 'curl https://api.github.com/zen';
-					// exec(cmd, function callback(error, stdout, stderr) {
-					// 	zen = stdout;
 					res.render('index', {
 						title: 'AA',
 						members: members,
 						backups: backups,
-						// zen: zen,
 						success: success,
 						error: error
 					});
-					// });
 				}
 			});
 		}
