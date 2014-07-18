@@ -72,7 +72,7 @@
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th class="col-md-2"><input id="all" type="checkbox" checked></th>
+                <th class="col-md-2"><input id="all" type="checkbox"></th>
                 <th>top</th>
                 <th>balance</th>
                 <th><a href="/add"><i class="glyphicon glyphicon-plus-sign"></i></a></th>
@@ -81,7 +81,7 @@
             <tbody>
             <% for (var i=0; i<members.length; i++) { %>
               <tr class="member">
-                <td><input class="single" type="checkbox" value="<%=members[i].email%>" checked></td>
+                <td><input class="single" type="checkbox" value="<%=members[i].email%>"></td>
                 <td><a><%=members[i].name%></a></td>
                 <td>&yen;<%=Math.round(members[i].balance*1000000)/1000000%></td>
                 <td><a href="/detail/<%=members[i].email%>"><i class="glyphicon glyphicon-pencil"></i></a></td>
