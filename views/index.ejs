@@ -122,7 +122,7 @@
           <div class="modal-body" id="modal-body-charge">
             <select class="form-control" id="payer">
               <% for (var i=0; i<members.length; i++) { %>
-                <option value="<%=members[i].email%>"><%=members[i].name%>&nbsp;&nbsp;(&yen;<%=members[i].balance%>)</option>
+                <option value="<%=members[i].email%>"><%-members[i].name%>&nbsp;&nbsp;(&yen;<%=members[i].balance%>)</option>
               <% } %>
             </select>
             <br />

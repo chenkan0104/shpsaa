@@ -151,7 +151,7 @@ exports.charge = function(req, res){
 					mailTo += ", "+members[i]+"@baidu.com";
 			};
 			Member.findNameByEmail(payer, function (err, name) {
-				var payerName = name;
+				var payerName = name.replace(/<(?:.|\n)*?>/gm, '');
 				var mailHtml = "<h3>"+payerName+"付了"+money+"元</h3>";
 				mailHtml += "<h5>一起吃的有：";
 				var count = 0;
